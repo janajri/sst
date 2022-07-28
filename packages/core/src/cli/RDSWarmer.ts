@@ -10,23 +10,27 @@ interface Opts {
 }
 
 export function createRDSWarmer(opts: Opts) {
-  opts.bus.subscribe("stacks.deployed", (evt) => {
-    evt.properties.metadata
-      .filter((c) => c.type === "RDS")
-      .map((c) => {
-        const client = new RDSDataService({
-          region: opts.config.region,
-        });
-        Logger.print("debug", `RDSWarmer: warming ${c.id}`);
+  let interval: NodeJS.Timer;
+  opts.bus.subscribe("stacks.deployed", evt => {
+    if (interval) clearInterval(interval);
+    interval = setInterval(() => {
+      evt.properties.metadata
+        .filter(c => c.type === "RDS")
+        .map(c => {
+          const client = new RDSDataService({
+            region: opts.config.region
+          });
+          Logger.print("debug", `RDSWarmer: warming ${c.id}`);
 
-        client
-          .executeStatement({
-            sql: "SELECT 1",
-            secretArn: c.data.secretArn,
-            resourceArn: c.data.clusterArn,
-            database: c.data.defaultDatabaseName,
-          })
-          .promise();
-      });
+          client
+            .executeStatement({
+              sql: "SELECT 1",
+              secretArn: c.data.secretArn,
+              resourceArn: c.data.clusterArn,
+              database: c.data.defaultDatabaseName
+            })
+            .promise();
+        });
+    }, 1000 * 60);
   });
 }
