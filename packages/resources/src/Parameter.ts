@@ -42,8 +42,12 @@ export class Parameter extends Construct {
 
     // Create SSM parameter
     new ssm.StringParameter(this, "Parameter", {
-      parameterName: FunctionConfig.buildSsmNameForParameter(app.name, app.stage, id),
-      stringValue: value,
+      parameterName: FunctionConfig.buildSsmNameForParameter(
+        app.name,
+        app.stage,
+        id
+      ),
+      stringValue: value
     });
   }
 
@@ -56,15 +60,15 @@ export class Parameter extends Construct {
   }
 
   public static clear() {
-    return Parameter.all = new Set<string>();
+    return (Parameter.all = new Set<string>());
   }
 
   public getConstructMetadata() {
     return {
       type: "Parameter" as const,
       data: {
-        name: this.name,
-      },
+        name: this.name
+      }
     };
   }
 }
