@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-stack/node",
+  "name": "@serverless-stack/lambda",
   "version": "1.6.6",
   "type": "module",
   "sideEffects": false,
